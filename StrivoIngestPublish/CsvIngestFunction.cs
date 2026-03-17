@@ -69,7 +69,7 @@ public class CsvIngestFunction
                 var message = CsvMessageBuilder.BuildMessage(line, blobItem.Name);
 
                 await queueClient.SendMessageAsync(message, cancellationToken: cancellationToken);
-                _logger.LogDebug("Published row to queue from {BlobName}: {Message}", blobItem.Name, message);
+                _logger.LogInformation("Read and published row {RowNumber} from {BlobName} to queue.", rowCount, blobItem.Name);
 
                 int delayMs = Random.Shared.Next(100, 3001);
                 await Task.Delay(delayMs, cancellationToken);
@@ -78,6 +78,10 @@ public class CsvIngestFunction
             if (rowCount == 0)
             {
                 _logger.LogWarning("Blob {BlobName} is empty – skipping.", blobItem.Name);
+            }
+            else
+            {
+                _logger.LogInformation("Finished {BlobName}: {RowCount} row(s) published to queue.", blobItem.Name, rowCount);
             }
         }
 
